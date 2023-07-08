@@ -5,7 +5,7 @@
          chain-bind-opt
          (struct-out page))
 
-(struct page (key title css-paths content) #:transparent #:mutable)
+(struct page (key title css-paths) #:transparent #:mutable)
 
 (struct optional (success? result))
 
