@@ -5,18 +5,20 @@
 (require "templates.rkt")
 (require "file-io.rkt")
 
-(define-struct-updaters page)
-
 (define (get-page-with-content p)
   (cond
-    [(not (and (page? p) (string? (page-key p)))) (optional #f "Not a valid page")]
-    [else (optional #t (cons p (parse-markdown-file (string-append (page-key p) ".md"))))]))
+    [(not (string? (hash-ref p 'path))) (optional #f "Not a valid page")]
+    [else (optional #t (cons p (parse-markdown-file (string-append (hash-ref p 'path) ".md"))))]))
 
 (define (build-page p)
-  (cons (page-key p) (chain-bind-opt p get-page-with-content default-template)))
+  (cons (hash-ref p 'path) (chain-bind-opt p get-page-with-content default-template)))
 
-; main
-(define page-definitions (dynamic-require "definitions.rkt" 'page-definitions))
+(define (load-page-definitions path)
+  (dynamic-require path 'page-definitions))
+
+(define page-definitions (load-page-definitions "definitions.rkt"))
+
+(println page-definitions)
 
 (create-required-directories page-definitions)
 
@@ -25,8 +27,7 @@
           page-definitions))
 
 (define gen-page-definitions (filter (lambda (p) (equal? 'gen (hash-ref p 'type))) page-definitions))
-(define gen-pages (map (lambda (p) (apply page (hash-ref p 'config))) gen-page-definitions))
-(define page-pairs (map build-page gen-pages))
+(define page-pairs (map build-page gen-page-definitions))
 (define success-pages (filter (lambda (page-pair) (optional-success? (cdr page-pair))) page-pairs))
 (define failed-pages
   (filter (lambda (page-pair) (not (optional-success? (cdr page-pair)))) page-pairs))

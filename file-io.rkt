@@ -30,10 +30,14 @@
 (define (copy-page file-path)
   (copy-file file-path (string-append output-path file-path) #t))
 
+(define (pnr x)
+  (println x)
+  x)
+
 (define (create-required-directories page-definitions)
-  (define path-responses (filter (lambda (r) (optional-success? r)) (map get-path page-definitions)))
+  (define path-responses (pnr (map (lambda (p) (hash-ref p 'path)) page-definitions)))
   (define output-paths
-    (list->set (append-map (lambda (r) (get-output-dir-paths (optional-result r))) path-responses)))
+    (list->set (append-map (lambda (r) (get-output-dir-paths (pnr r))) path-responses)))
   (define output-paths-sorted ; sort output paths by length to ensure parent directories are created first
     (sort (set->list output-paths)
           (lambda (a b) (< (string-length a) (string-length b)))
@@ -49,13 +53,6 @@
 
 (define (but-last xs)
   (reverse (cdr (reverse xs))))
-
-(define (get-path page-definition)
-  (define page-type (hash-ref page-definition 'type))
-  (cond
-    [(equal? page-type 'gen) (optional #t (page-key (apply page (hash-ref page-definition 'config))))]
-    [(equal? page-type 'copy) (optional #t (hash-ref page-definition 'path))]
-    [else (optional #f "Unsupported page type")]))
 
 (define (get-output-dir-paths path)
   (define (get-output-dir-paths-iter segments i paths)

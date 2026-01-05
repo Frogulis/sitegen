@@ -2,10 +2,7 @@
 
 (provide (struct-out optional)
          bind-opt
-         chain-bind-opt
-         (struct-out page))
-
-(struct page (key title css-paths) #:transparent #:mutable)
+         chain-bind-opt)
 
 (struct optional (success? result))
 
