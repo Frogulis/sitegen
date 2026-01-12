@@ -6,20 +6,33 @@
 (provide output-path
          parse-markdown-file
          write-generated-page
+         generate-page-as-string
          copy-page
          copy-dir
-         create-required-directories)
+         create-required-directories
+         write-string-to-file)
 
 (define output-path "output/")
+
+(define (write-string-to-file file-name content)
+  (define out (open-output-file (string-append output-path file-name) #:exists 'truncate/replace))
+  (display content out)
+  (close-output-port out))
 
 (define (parse-markdown-file file-name)
   (parse-markdown (file->string file-name)))
 
 (define (write-generated-page p)
   (define out
-    (open-output-file (string-append output-path (car p) ".html") #:exists 'truncate/replace))
+    (open-output-file (string-append output-path (hash-ref (car p) 'path) ".html")
+                      #:exists 'truncate/replace))
   (display (xexpr->string (optional-result (cdr p))) out)
   (close-output-port out))
+
+(define (generate-page-as-string my-xml)
+  (define out (open-output-string))
+  (display (xexpr->string my-xml) out)
+  (get-output-string out))
 
 (define (copy-dir dir-path)
   (define out-path (string-append output-path dir-path))
@@ -29,10 +42,6 @@
 
 (define (copy-page file-path)
   (copy-file file-path (string-append output-path file-path) #t))
-
-(define (pnr x)
-  (println x)
-  x)
 
 (define (create-required-directories page-definitions)
   (define path-responses (pnr (map (lambda (p) (hash-ref p 'path)) page-definitions)))

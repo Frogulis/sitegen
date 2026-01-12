@@ -2,7 +2,8 @@
 
 (provide (struct-out optional)
          bind-opt
-         chain-bind-opt)
+         chain-bind-opt
+         pnr)
 
 (struct optional (success? result))
 
@@ -18,6 +19,10 @@
       [(empty? fs) m]
       [else (chain-bind-opt-iter ((first fs) (optional-result m)) (rest fs))]))
   (chain-bind-opt-iter (optional #t m) fs))
+
+(define (pnr x)
+  (println x)
+  x)
 
 (define (f x)
   (cond
