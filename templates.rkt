@@ -15,6 +15,7 @@
     (optional #t
               `(html ((lang "en"))
                      (head (meta ((name "viewport") (content "width=device-width, initial-scale=1")))
+                           (meta ((charset "utf-8")))
                            (title (unquote (hash-ref p 'title)))
                            (unquote-splicing (css-links (hash-ref p 'css-files)))
                            (link ((rel "alternate") (type "application/atom+xml") (href "feed.xml"))))
